@@ -1033,11 +1033,6 @@ workflows:
       - typecheck:
           requires:
             - bootstrap
-      - windows_unit_tests:
-          <<: *ignore_docs
-          requires:
-            - lint
-            - bootstrap
       - unit_tests_node14:
           <<: *ignore_docs
           requires:
@@ -1111,11 +1106,6 @@ workflows:
       - lint_large
       - typecheck_large:
           requires:
-            - bootstrap_large
-      - windows_unit_tests_large:
-          <<: *ignore_docs
-          requires:
-            - lint_large
             - bootstrap_large
       - unit_tests_node14_large:
           <<: *ignore_docs
