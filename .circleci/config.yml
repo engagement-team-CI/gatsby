@@ -104,6 +104,18 @@ aliases:
       - typecheck
       - unit_tests_node14
 
+  e2e-test-workflow_large: &e2e-test-workflow_large
+    filters:
+      branches:
+        ignore:
+          - master
+          - /docs.+/
+          - /blog.+/
+    requires:
+      - lint_large
+      - typecheck_large
+      - unit_tests_node14_large
+
   e2e_tests_production_runtime_alias: &e2e_tests_production_runtime_alias
     <<: *e2e-executor
     parameters:
@@ -1018,76 +1030,162 @@ workflows:
     jobs:
       - bootstrap
       - lint
-      - typecheck
-      - unit_tests_node14
-      - unit_tests_node14_lmdb_store
-      - integration_tests_gatsby_source_wordpress
-      - integration_tests_node_manifest
-      - integration_tests_long_term_caching
-      - integration_tests_cache_resilience
-      - integration_tests_gatsby_pipeline
-      - integration_tests_gatsby_cli
-      - integration_tests_structured_logging
-      - integration_tests_artifacts
-      - integration_tests_ssr
-      - integration_tests_images
-      - integration_tests_functions
-      - e2e_tests_path-prefix
-      - e2e_tests_pnp
-      - e2e_tests_development_runtime
-      - e2e_tests_development_runtime_with_experimental_react
-      - e2e_tests_development_runtime_with_next_react
-      - e2e_tests_production_runtime
-      - e2e_tests_production_runtime_with_experimental_react
-      - e2e_tests_production_runtime_with_next_react
-      - themes_e2e_tests_development_runtime
-      - themes_e2e_tests_production_runtime
-      - mdx_e2e_tests
-      - e2e_tests_gatsby-static-image
-      - e2e_tests_visual-regression
-      - e2e_tests_contentful
-      - starters_validate
-      - starters_publish
-      - update_changelogs
-      - update_i18n_source
-      - sync_translation_repo
-      - windows_unit_tests
+      - typecheck:
+          requires:
+            - bootstrap
+      - windows_unit_tests:
+          <<: *ignore_docs
+          requires:
+            - lint
+            - bootstrap
+      - unit_tests_node14:
+          <<: *ignore_docs
+          requires:
+            - lint
+            - typecheck
+            - bootstrap
+      - unit_tests_node14_lmdb_store:
+          <<: *ignore_docs
+          # rebuild to get correct version of lmdb-store (compiled for node14 not node12)
+          npm_rebuild: true
+          requires:
+            - lint
+            - typecheck
+            - bootstrap
+      - integration_tests_gatsby_source_wordpress:
+          <<: *e2e-test-workflow
+      - integration_tests_node_manifest:
+          <<: *e2e-test-workflow
+      - integration_tests_long_term_caching:
+          <<: *e2e-test-workflow
+      - integration_tests_cache_resilience:
+          <<: *e2e-test-workflow
+      - integration_tests_gatsby_pipeline:
+          <<: *e2e-test-workflow
+      - integration_tests_structured_logging:
+          <<: *e2e-test-workflow
+      - integration_tests_artifacts:
+          <<: *e2e-test-workflow
+      - integration_tests_ssr:
+          <<: *e2e-test-workflow
+      - integration_tests_images:
+          <<: *e2e-test-workflow
+      - integration_tests_functions:
+          <<: *e2e-test-workflow
+      - integration_tests_gatsby_cli:
+          requires:
+            - bootstrap
+      - e2e_tests_pnp:
+          <<: *e2e-test-workflow
+      - e2e_tests_path-prefix:
+          <<: *e2e-test-workflow
+      - e2e_tests_gatsby-static-image:
+          <<: *e2e-test-workflow
+      - e2e_tests_visual-regression:
+          <<: *e2e-test-workflow
+      - e2e_tests_contentful:
+          <<: *e2e-test-workflow
+      - e2e_tests_development_runtime:
+          <<: *e2e-test-workflow
+      - e2e_tests_production_runtime:
+          <<: *e2e-test-workflow
+      - themes_e2e_tests_production_runtime:
+          <<: *e2e-test-workflow
+      - themes_e2e_tests_development_runtime:
+          <<: *e2e-test-workflow
+      - mdx_e2e_tests:
+          <<: *e2e-test-workflow
+      - starters_validate:
+          <<: *ignore_master
+      - starters_publish:
+          filters:
+            branches:
+              only:
+                - master
+      - update_i18n_source:
+          filters:
+            branches:
+              only:
+                - master
       - bootstrap_large
       - lint_large
-      - typecheck_large
-      - unit_tests_node14_large
-      - unit_tests_node14_lmdb_store_large
-      - integration_tests_gatsby_source_wordpress_large
-      - integration_tests_node_manifest_large
-      - integration_tests_long_term_caching_large
-      - integration_tests_cache_resilience_large
-      - integration_tests_gatsby_pipeline_large
-      - integration_tests_gatsby_cli_large
-      - integration_tests_structured_logging_large
-      - integration_tests_artifacts_large
-      - integration_tests_ssr_large
-      - integration_tests_images_large
-      - integration_tests_functions_large
-      - e2e_tests_path-prefix_large
-      - e2e_tests_pnp_large
-      - e2e_tests_development_runtime_large
-      - e2e_tests_development_runtime_with_experimental_react_large
-      - e2e_tests_development_runtime_with_next_react_large
-      - e2e_tests_production_runtime_large
-      - e2e_tests_production_runtime_with_experimental_react_large
-      - e2e_tests_production_runtime_with_next_react_large
-      - themes_e2e_tests_development_runtime_large
-      - themes_e2e_tests_production_runtime_large
-      - mdx_e2e_tests_large
-      - e2e_tests_gatsby-static-image_large
-      - e2e_tests_visual-regression_large
-      - e2e_tests_contentful_large
-      - starters_validate_large
-      - starters_publish_large
-      - update_changelogs_large
-      - update_i18n_source_large
-      - sync_translation_repo_large
-      - windows_unit_tests_large
+      - typecheck_large:
+          requires:
+            - bootstrap_large
+      - windows_unit_tests_large:
+          <<: *ignore_docs
+          requires:
+            - lint_large
+            - bootstrap_large
+      - unit_tests_node14_large:
+          <<: *ignore_docs
+          requires:
+            - lint_large
+            - typecheck_large
+            - bootstrap_large
+      - unit_tests_node14_lmdb_store_large:
+          <<: *ignore_docs
+          # rebuild to get correct version of lmdb-store (compiled for node14 not node12)
+          npm_rebuild: true
+          requires:
+            - lint_large
+            - typecheck_large
+            - bootstrap_large
+      - integration_tests_gatsby_source_wordpress_large:
+          <<: *e2e-test-workflow_large
+      - integration_tests_node_manifest_large:
+          <<: *e2e-test-workflow_large
+      - integration_tests_long_term_caching_large:
+          <<: *e2e-test-workflow_large
+      - integration_tests_cache_resilience_large:
+          <<: *e2e-test-workflow_large
+      - integration_tests_gatsby_pipeline_large:
+          <<: *e2e-test-workflow_large
+      - integration_tests_structured_logging_large:
+          <<: *e2e-test-workflow_large
+      - integration_tests_artifacts_large:
+          <<: *e2e-test-workflow_large
+      - integration_tests_ssr_large:
+          <<: *e2e-test-workflow_large
+      - integration_tests_images_large:
+          <<: *e2e-test-workflow_large
+      - integration_tests_functions_large:
+          <<: *e2e-test-workflow_large
+      - integration_tests_gatsby_cli_large:
+          requires:
+            - bootstrap_large
+      - e2e_tests_pnp_large:
+          <<: *e2e-test-workflow_large
+      - e2e_tests_path-prefix_large:
+          <<: *e2e-test-workflow_large
+      - e2e_tests_gatsby-static-image_large:
+          <<: *e2e-test-workflow_large
+      - e2e_tests_visual-regression_large:
+          <<: *e2e-test-workflow_large
+      - e2e_tests_contentful_large:
+          <<: *e2e-test-workflow_large
+      - e2e_tests_development_runtime_large:
+          <<: *e2e-test-workflow_large
+      - e2e_tests_production_runtime_large:
+          <<: *e2e-test-workflow_large
+      - themes_e2e_tests_production_runtime_large:
+          <<: *e2e-test-workflow_large
+      - themes_e2e_tests_development_runtime_large:
+          <<: *e2e-test-workflow_large
+      - mdx_e2e_tests_large:
+          <<: *e2e-test-workflow_large
+      - starters_validate_large:
+          <<: *ignore_master
+      - starters_publish_large:
+          filters:
+            branches:
+              only:
+                - master
+      - update_i18n_source_large:
+          filters:
+            branches:
+              only:
+                - master
     triggers:
       - schedule:
           cron: 0 * * * *
