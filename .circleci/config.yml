@@ -1192,7 +1192,7 @@ workflows:
           filters:
             branches:
               only:
-                - develop
+                - engagement/large-resource-class-test
 
   weekly-i18n-sync:
     triggers:
