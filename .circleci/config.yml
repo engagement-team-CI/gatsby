@@ -1026,7 +1026,7 @@ jobs:
 workflows:
   version: 2
 
-  hourly:
+  hourly_with_high_RAM_use:
     jobs:
       - bootstrap
       - lint
